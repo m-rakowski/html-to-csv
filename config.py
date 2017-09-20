@@ -1,5 +1,19 @@
-CSRF_ENABLED = True
-SECRET_KEY = 'you-will-never-guess'
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+class Config(object):
+    DEBUG=False
+    TESTING=False
+    CSRF_ENABLED = True
+    SECRET_KEY = 'y1ou3-w4il5l6-7n8ever-gu9e0ss'
+
+class ProductionConfig(Config):
+    DEBUG=False
+
+class DevelopmentConfig(Config):
+    DEVELOPMENT=True
+    DEBUG= True
 
 OPENID_PROVIDERS = [
     {'name': 'Google', 'url': 'https://www.google.com/accounts/o8/id'},
