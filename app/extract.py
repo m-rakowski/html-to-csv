@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 import requests
 import csv
+import re
 
 class Extraction():
 
@@ -10,90 +11,70 @@ class Extraction():
         return tag.has_attr('class')
 
 
-    def get_all_game_links(self):
-        url = "https://itch.io/jam/slavic-game-jam-2017"
-        print("Downloading " + url)
+    def get_info_dict(self,url):
+        
         r = requests.get(url)
         r.encoding = 'utf-8'
-
         data = r.text
 
         soup = BeautifulSoup(data, "html.parser")
 
-        games = soup.find_all("a", {"class": "thumb_link"})
-        game_links = []
+        info_dict = {'url' : '',
+                     'title' : '',
+                     'author' : '',
+                     'description' : '',
+                     'charset' : '',
+                     'lang' : ''
+        }
 
-        for game in games:
-            game_links.append(game['href'])
-
-        return game_links
-
-
-    def get_game_info_dict(self,game_url):
-        r = requests.get(game_url)
-        r.encoding = 'utf-8'
-        data = r.text
-
-        soup = BeautifulSoup(data, "html.parser")
-
-        game_info_dict = {}
-
-        game_info_dict['game_title'] = soup.find_all("h1", {"class": "game_title"})[0].string if len(
-            soup.find_all("h1", {"class": "game_title"})) > 0 else ''
-        print("game_title =", game_info_dict['game_title'])
-
-        game_info_dict['sub_title'] = soup.find_all("div", {"class": "header_buy_row"})[0].text if len(
-            soup.find_all("div", {"class": "header_buy_row"})) > 0 else ''
-        print("sub_title =", game_info_dict['sub_title'])
-
-        game_info_dict['description'] = soup.find_all("div", {"class": "formatted_description"})[0].text if len(
-            soup.find_all("div", {"class": "formatted_description"})) > 0 else ''
-        print("description =", game_info_dict['description'])
-
-        game_info_dict['url'] = game_url
-        print("url =", game_info_dict['url'])
-        info_row = {}
-        game_info2 = soup.find_all("div", {"class": "game_info_panel_widget"})[0].table.tbody.contents if len(
-            soup.find_all("div", {"class": "game_info_panel_widget"})) > 0 else list()
-        for info in game_info2:
-            info_row[info.contents[0].text] = info.contents[1].text
-            # print(info.contents[0].text+" | "+info.contents[1].text)
-
-        print(info_row)
-        game_info_dict['authors'] = info_row.get('Authors')
-        print("authors =", game_info_dict['authors'])
-
-        game_info_dict['published'] = info_row.get('Published')
-        print("published =", game_info_dict['published'])
-
-        game_info_dict['status'] = info_row.get('Status')
-        print("status =", game_info_dict['status'])
-
-        game_info_dict['platforms'] = info_row.get('Platforms')
-        print("platforms =", game_info_dict['platforms'])
-
-        game_info_dict['rating'] = info_row.get('Rating')
-        print("rating =", game_info_dict['rating'])
-
-        game_info_dict['genre'] = info_row.get('Genre')
-        print("genre =", game_info_dict['genre'])
-
-        return game_info_dict
+        
+        info_dict['url']= url
+        
+        title_object = soup.find("title")
+        if title_object is not None:
+            info_dict['title'] = title_object.string.encode('utf-8')
+        
+       
+        author_object = soup.find("meta",{"name" : "author"})
+        if author_object is not None:
+            info_dict['author'] = author_object['content'].encode('utf-8')
+       
+        
+        description_object = soup.find("meta",{"name" : "description"})
+        if description_object is not None:
+            info_dict['description'] = description_object['content'].encode('utf-8')
+       
+               
+        charset_object = soup.find("meta", charset = re.compile('\d'))
+        if charset_object is not None:
+            info_dict['charset'] = charset_object['charset'].encode('utf-8')
+       
+        
+        lang_object = soup.find("html", lang = re.compile('\d'))
+        if lang_object is not None:
+            info_dict['lang'] = lang_object['lang'].encode('utf-8')
+        
+       
+        return info_dict
 
 
     def run(self,urls):
 
+        urls = [ url.strip() for url in urls.strip().splitlines() if url]
+        
+        print(urls)
         with open('app/static/sites_metadata.csv', 'w') as csvfile:
-            fieldnames = ['title', 'language', 'url']
+            fieldnames = ['url', 'title', 'author', 'description', 'charset', 'lang']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, dialect='excel')
             writer.writeheader()
             
-            row = {}
-            row['title']="SOME TITLE"
-            row['language']="SOME SUBTITLE"
-            row['url']="some url"
             
-            writer.writerow(row)
+            for url in urls:
+                url='http://'+url if not url[:4].lower() == 'http' else url
+                
+                row = self.get_info_dict(url)
+                print("ROW: ",row)
+                writer.writerow(row)
             
             
         print("Data extraction successful.")

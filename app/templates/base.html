@@ -8,15 +8,22 @@
     {% endif %}
   </head>
   <body>
-	  <h1>Beautiful Soup - beautiful web scraping</h1>
-	  <h2>Helping you extract metadata from websites.</h2>
+	  <h1>Beautiful Soup + flask + csv</h1>
+	  <h2> = super easy website metadata extraction</h2>
 	  <dir>Paste URLs:</dir>
    <form action="/download" method=post>
-  <textarea name="urls"rows=10/>
-  www.google.com
-  www.msn.com
+<textarea rows="20" cols="20" name="urls" >
+www.google.com
+
+https://www.msn.com
+
   www.yahoo.com
-  </textarea><br/>
+reddit.com/
+youtube.com
+
+wikipedia.org/
+
+</textarea><br/>
   <input type="submit" value="Download csv">
 </form> 
 {{urls}}
