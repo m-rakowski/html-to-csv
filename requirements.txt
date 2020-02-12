@@ -18,7 +18,7 @@ numpy==1.11.1rc1
 pexpect==4.2.0
 ptyprocess==0.5.1
 pytz==2017.2
-requests==2.18.4
+requests==2.20.0
 simplegeneric==0.8.1
 urllib3==1.24.2
 virtualenv==15.0.3
