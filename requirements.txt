@@ -12,7 +12,7 @@ gunicorn==19.7.1
 idna==2.6
 ipython==2.4.1
 itsdangerous==0.24
-Jinja2==2.9.6
+Jinja2==2.11.3
 MarkupSafe==1.0
 numpy==1.11.1rc1
 pexpect==4.2.0
