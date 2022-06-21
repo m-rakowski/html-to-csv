@@ -14,7 +14,7 @@ ipython==2.4.1
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
-numpy==1.11.1rc1
+numpy==1.22.0rc1
 pexpect==4.2.0
 ptyprocess==0.5.1
 pytz==2017.2
